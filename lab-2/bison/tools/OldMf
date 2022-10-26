@@ -1,0 +1,36 @@
+.PHONY: build
+
+C = gcc 
+B = bison 
+V = @
+SRC = token_1.y token_2.y token_3.y
+
+TARGET = $(SRC:%.y=% )
+
+BFILE = $(SRC:%.y=%.tab.c)
+
+SRCPATH = ./src/
+TARPATH = ./target/
+
+.PHONY: test build mkdir
+test: build
+	./tools/test.sh
+build: mkdir $(TARGET)
+	echo $(BFILE)
+
+mkdir:
+	mkdir -p $(TARPATH)
+
+$(TARGET):$(BFILE)
+	$(foreach f,$(BFILE),$(C)$(f);)
+
+$(BFILE):
+	$(foreach f,$(SRC),$(B)$(f);)
+
+
+
+.PHONY: clean
+clean:
+	-rm -f *.tab.c
+
+	-rm $(TARGET)
