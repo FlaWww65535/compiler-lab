@@ -1,79 +1,79 @@
-[DEBUG LAB4]: 	INT	int
-ID f is 0
-[DEBUG LAB4]: 	LPAREN	(
-[DEBUG LAB4]: 	RPAREN	)
-[DEBUG LAB4]: 	LBRACE	{
-[DEBUG LAB4]: 	INT	int
-ID a is 1
-[DEBUG LAB4]: 	SEMICOLON	;
-ID a is 1
-[DEBUG LAB4]: 	ASSIGN	=
-DEM is 0
-[DEBUG LAB4]: 	SEMICOLON	;
-ID while is 2
-[DEBUG LAB4]: 	LPAREN	(
-ID a is 1
-[DEBUG LAB4]: 	LESS	<
-DEM is 10
-[DEBUG LAB4]: 	RPAREN	)
-[DEBUG LAB4]: 	LBRACE	{
-ID a is 1
-[DEBUG LAB4]: 	ASSIGN	=
-ID a is 1
-*DEM is 2345
-[DEBUG LAB4]: 	SEMICOLON	;
-[DEBUG LAB4]: 	RBRACE	}
-[DEBUG LAB4]: 	RETURN	return
-ID a is 1
-[DEBUG LAB4]: 	SEMICOLON	;
-[DEBUG LAB4]: 	RBRACE	}
-[DEBUG LAB4]: 	INT	int
-ID main is 3
-[DEBUG LAB4]: 	LPAREN	(
-[DEBUG LAB4]: 	RPAREN	)
-[DEBUG LAB4]: 	LBRACE	{
-[DEBUG LAB4]: 	INT	int
-ID _testid is 4
-[DEBUG LAB4]: 	SEMICOLON	;
-ID _testid is 4
-[DEBUG LAB4]: 	ASSIGN	=
-DEM is 0
-[DEBUG LAB4]: 	SEMICOLON	;
-[DEBUG LAB4]: 	IF	if
-[DEBUG LAB4]: 	LPAREN	(
-ID _testid is 4
-[DEBUG LAB4]: 	ASSIGN	=
-[DEBUG LAB4]: 	ASSIGN	=
-DEM is 0
-[DEBUG LAB4]: 	RPAREN	)
-[DEBUG LAB4]: 	LBRACE	{
-[DEBUG LAB4]: 	INT	int
-ID _testid is 4
-[DEBUG LAB4]: 	SEMICOLON	;
-[DEBUG LAB4]: 	INT	int
-ID _testid2 is 5
-[DEBUG LAB4]: 	SEMICOLON	;
-ID _testid1 is 6
-[DEBUG LAB4]: 	ASSIGN	=
-ID _testid1 is 6
-[DEBUG LAB4]: 	ADD	+
-DEM is 1
-[DEBUG LAB4]: 	SEMICOLON	;
-[DEBUG LAB4]: 	RBRACE	}
-[DEBUG LAB4]: 	LBRACE	{
-[DEBUG LAB4]: 	INT	int
-ID a is 1
-[DEBUG LAB4]: 	SEMICOLON	;
-[DEBUG LAB4]: 	RBRACE	}
-[DEBUG LAB4]: 	LBRACE	{
-[DEBUG LAB4]: 	INT	int
-ID a is 1
-[DEBUG LAB4]: 	SEMICOLON	;
-[DEBUG LAB4]: 	RBRACE	}
-[DEBUG LAB4]: 	INT	int
-ID b is 7
-[DEBUG LAB4]: 	SEMICOLON	;
-[DEBUG LAB4]: 	RETURN	return
-DEM is 0
-[DEBUG LAB4]: 	SEMICOLON	;
-[DEBUG LAB4]: 	RBRACE	}
+     token    lexeme    lineno       val
+       INT       int         3         0
+        ID         f         3         1
+    LPAREN         (         3         0
+    RPAREN         )         3         0
+    LBRACE         {         3         0
+       INT       int         4         0
+        ID         a         4         3
+ SEMICOLON         ;         4         0
+        ID         a         5         3
+    ASSIGN         =         5         0
+       NUM         0         5         0
+ SEMICOLON         ;         5         0
+        ID     while         6         3
+    LPAREN         (         6         0
+        ID         a         6         3
+      LESS         <         6         0
+       NUM        10         6        10
+    RPAREN         )         6         0
+    LBRACE         {         6         0
+        ID         a         7         6
+    ASSIGN         =         7         0
+        ID         a         7         6
+*       NUM      2345         7      2345
+ SEMICOLON         ;         7         0
+    RBRACE         }         8         0
+    RETURN    return         9         0
+        ID         a         9         3
+ SEMICOLON         ;         9         0
+    RBRACE         }        10         0
+       INT       int        12         0
+        ID      main        12         1
+    LPAREN         (        12         0
+    RPAREN         )        12         0
+    LBRACE         {        12         0
+       INT       int        13         0
+        ID   _testid        13        12
+ SEMICOLON         ;        13         0
+        ID   _testid        14        12
+    ASSIGN         =        14         0
+       NUM         0        14         0
+ SEMICOLON         ;        14         0
+        IF        if        15         0
+    LPAREN         (        15         0
+        ID   _testid        15        12
+    ASSIGN         =        15         0
+    ASSIGN         =        15         0
+       NUM         0        15         0
+    RPAREN         )        15         0
+    LBRACE         {        15         0
+       INT       int        16         0
+        ID   _testid        16        15
+ SEMICOLON         ;        16         0
+       INT       int        17         0
+        ID  _testid2        17        15
+ SEMICOLON         ;        17         0
+        ID  _testid1        18        15
+    ASSIGN         =        18         0
+        ID  _testid1        18        15
+       NUM        +1        18         1
+ SEMICOLON         ;        18         0
+    RBRACE         }        19         0
+    LBRACE         {        23         0
+       INT       int        24         0
+        ID         a        24        23
+ SEMICOLON         ;        24         0
+    RBRACE         }        25         0
+    LBRACE         {        26         0
+       INT       int        27         0
+        ID         a        27        26
+ SEMICOLON         ;        27         0
+    RBRACE         }        28         0
+       INT       int        29         0
+        ID         b        29        12
+ SEMICOLON         ;        29         0
+    RETURN    return        30         0
+       NUM         0        30         0
+ SEMICOLON         ;        30         0
+    RBRACE         }        31         0
