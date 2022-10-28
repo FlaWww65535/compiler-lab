@@ -18,21 +18,39 @@
     #ifdef ONLY_FOR_LEX
     #include <ostream>
     #include <fstream>
-    using namespace std;
+    #include<unordered_map>
+	using namespace std;
     extern FILE *yyin; 
     extern FILE *yyout;
 
-    void DEBUG_FOR_LAB4(std::string s){
+	int total_num=0;
+
+	struct Var{
+		int v;
+		Var* next;
+	};
+	struct Symbol{
+		string s;
+		Var* head;
+	};
+
+	unordered_map<string,Symbol>sy_hash;
+    
+	void DEBUG_FOR_LAB4(std::string s){
         std::string DEBUG_INFO = "[DEBUG LAB4]: \t" + s + "\n";
         fputs(DEBUG_INFO.c_str(), yyout);
     }
     #endif
 %}
 
-DECIMIAL ([1-9][0-9]*|0)
+DECIMIAL ([0-9]+)
 ID [[:alpha:]_][[:alpha:][:digit:]_]*
 EOL (\r\n|\n|\r)
 WHITE [\t ]
+line_comment "//".*\n
+comment_begin "/*"
+comment_element .|\n
+comment_end "*/"
 %x BLOCKCOMMENT
 
 %%
@@ -136,7 +154,26 @@ WHITE [\t ]
 }
 
 {EOL} yylineno++;
-{WHITE}
+{WHITE} {}
+{line_comment} {}
+{comment_begin} BEGIN(BLOCKCOMMENT);
+<BLOCKCOMMENT>{comment_element} {}
+<BLOCKCOMMENT>{comment_end} BEGIN(INITIAL);
+{ID} {
+	string s = yytext;
+	if(sy_hash.find(s) == sy_hash.end()){
+		sy_hash[s].s=s;
+		sy_hash[s].head=new Var;
+		sy_hash[s].head->v=total_num;
+		fprintf(yyout,"ID %s is %d\n",s.c_str(),total_num);
+		total_num++;
+	}else{
+		fprintf(yyout,"ID %s is %d\n",s.c_str(),sy_hash[s].head->v);
+	}
+}
+{DECIMIAL} {
+	fprintf(yyout,"DEM is %s\n",yytext);
+}
 %%
 
 #ifdef ONLY_FOR_LEX
