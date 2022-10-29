@@ -12,30 +12,30 @@
  SEMICOLON         ;         5         0
         ID         a         6         4
     ASSIGN         =         6         0
-       INT         1         6         1
+       NUM         1         6         1
        ADD         +         6         0
-       INT         2         6         2
+       NUM         2         6         2
  SEMICOLON         ;         6         0
         IF        if         7         0
     LPAREN         (         7         0
         ID         a         7         4
       LESS         <         7         0
-       INT       0x5         7         5
+       NUM       0x5         7         5
     RPAREN         )         7         0
     RETURN    return         8         0
-       INT         1         8         1
+       NUM         1         8         1
  SEMICOLON         ;         8         0
     RETURN    return         9         0
-       INT         0         9         0
+       NUM         0         9         0
  SEMICOLON         ;         9         0
        INT       int        10         0
         ID         b        10         4
     ASSIGN         =        10         0
-       INT       017        10        15
+       NUM       017        10        15
  SEMICOLON         ;        10         0
        INT       int        11         0
         ID         c        11         4
     ASSIGN         =        11         0
-       INT      0x1a        11        26
+       NUM      0x1a        11        26
  SEMICOLON         ;        11         0
     RBRACE         }        12         0

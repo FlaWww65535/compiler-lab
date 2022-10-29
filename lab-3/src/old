@@ -62,16 +62,12 @@
 	void DEBUG_FOR_LAB4(string token,string lexeme,int lineno,int val){
 		fprintf(yyout,"%10s%10s%10d%10d\n",token.c_str(),lexeme.c_str(),lineno,val);
     }
-    void DEBUG_FOR_LAB4(string token,string lexeme,int lineno,float val){
-		fprintf(yyout,"%10s%10s%10d%10f\n",token.c_str(),lexeme.c_str(),lineno,val);
-    }
     #endif
 %}
 
 HEX (\+|\-)?0(X|x)[0-9a-fA-F]+
 OCTAL (\+|\-)?0[0-7]+
 DECIMAL (\+|\-)?[0-9]+
-FLOAT [-+]?[0-9]*\.?[0-9]*
 INT {HEX}|{OCTAL}|{DECIMAL}
 ID [[:alpha:]_][[:alpha:][:digit:]_]*
 EOL (\r\n|\n|\r)
@@ -124,32 +120,12 @@ comment_end "*/"
         return RETURN;
     #endif
 }
-"break" {
-    #ifdef ONLY_FOR_LEX
-        DEBUG_FOR_LAB4("BREAK","break",yylineno,0);
-    #else
-        return BREAK;
-    #endif
-}
-"continue" {
-    #ifdef ONLY_FOR_LEX
-        DEBUG_FOR_LAB4("CONTINUE","continue",yylineno,0);
-    #else
-        return CONTINUE;
-    #endif
-}
+
 "=" {
     #ifdef ONLY_FOR_LEX
         DEBUG_FOR_LAB4("ASSIGN","=",yylineno,0);
     #else
         return ASSIGN;
-    #endif
-}
-"==" {
-     #ifdef ONLY_FOR_LEX
-        DEBUG_FOR_LAB4("EQUAL","==",yylineno,0);
-    #else
-        return EQUAL;
     #endif
 }
 "<" {
@@ -159,67 +135,11 @@ comment_end "*/"
         return LESS;
     #endif
 }
-">" {
-    #ifdef ONLY_FOR_LEX
-        DEBUG_FOR_LAB4("GREATER",">",yylineno,0);
-    #else
-        return GREATER;
-    #endif
-}
-"<=" {
-    #ifdef ONLY_FOR_LEX
-        DEBUG_FOR_LAB4("LESSEQ","<=",yylineno,0);
-    #else
-        return LESSEQ;
-    #endif
-}
-">=" {
-    #ifdef ONLY_FOR_LEX
-        DEBUG_FOR_LAB4("GREATEREQ",">=",yylineno,0);
-    #else
-        return GREATEREQ;
-    #endif
-}
-"!=" {
-     #ifdef ONLY_FOR_LEX
-        DEBUG_FOR_LAB4("NOTEQ","!=",yylineno,0);
-    #else
-        return NOTEQ;
-    #endif
-}
 "+" {
     #ifdef ONLY_FOR_LEX
         DEBUG_FOR_LAB4("ADD","+",yylineno,0);
     #else
         return ADD;
-    #endif
-}
-"-" {
-    #ifdef ONLY_FOR_LEX
-        DEBUG_FOR_LAB4("MINUS","-",yylineno,0);
-    #else
-        return MINUS;
-    #endif
-}
-"*" {
-    #ifdef ONLY_FOR_LEX
-        DEBUG_FOR_LAB4("MUL","*",yylineno,0);
-    #else
-        return MUL;
-    #endif
-}
-"/" {
-     #ifdef ONLY_FOR_LEX
-        DEBUG_FOR_LAB4("DIV","/",yylineno,0);
-    #else
-        return DIV;
-    #endif
-}
-"%" {
-     #ifdef ONLY_FOR_LEX
-        DEBUG_FOR_LAB4("MOD","%",yylineno,0);
-    #else
-        return MOD;
     #endif
 }
 ";" {
@@ -257,6 +177,7 @@ comment_end "*/"
 "}" {
     #ifdef ONLY_FOR_LEX
         DEBUG_FOR_LAB4("RBRACE","}",yylineno,0);
+		printf("meet RBRACE at %d \n",yylineno);
 		//unload(BlockFrameList);
 		BlockFrame* tmp=BlockFrameList;
 		BlockFrameList=BlockFrameList->next;
@@ -265,58 +186,6 @@ comment_end "*/"
         return RBRACE;
     #endif
 }
-"&&" {
-
-   #ifdef ONLY_FOR_LEX
-        DEBUG_FOR_LAB4("AND","&&",yylineno,0);
-    #else
-    return AND;
-    #endif
-}
-"||" {
-
-    #ifdef ONLY_FOR_LEX
-        DEBUG_FOR_LAB4("OR","||",yylineno,0);
-    #else
-    return OR;
-    #endif
-}
-"!" {
-     #ifdef ONLY_FOR_LEX
-        DEBUG_FOR_LAB4("NOT","!",yylineno,0);
-    #else
-    return NOT;
-    #endif
-}
-"struct" {
-#ifdef ONLY_FOR_LEX
-        DEBUG_FOR_LAB4("STRUCT","struct",yylineno,0);
-    #else
-    return STRUCT;
-    #endif
-}
-"for" {
-    #ifdef ONLY_FOR_LEX
-        DEBUG_FOR_LAB4("FOR","for",yylineno,0);
-    #else
-    return FOR;
-    #endif
-}
-"[" {
-   #ifdef ONLY_FOR_LEX
-        DEBUG_FOR_LAB4("LSQUA","[",yylineno,0);
-    #else
-    return LSQUA;
-    #endif
-}
-"]" {
-   #ifdef ONLY_FOR_LEX
-        DEBUG_FOR_LAB4("RSQUA","]",yylineno,0);
-    #else
-    return RSQUA;
-    #endif
-}
-
 {EOL}
 {WHITE} {}
 {line_comment} {}
@@ -350,32 +219,12 @@ comment_end "*/"
 		sy_hash[s].head->v=BlockFrameList->scope;
 		sy_hash[s].head->next=NULL;
 	}
-	#ifdef ONLY_FOR_LEX
-        DEBUG_FOR_LAB4("ID",s.c_str(),yylineno,sy_hash[s].head->v);
-    #else
-    return ID;
-    #endif
-
+	DEBUG_FOR_LAB4("ID",s.c_str(),yylineno,sy_hash[s].head->v);
 }
 {INT} {
 	int i;
 	sscanf(yytext,"%i",&i);
-	#ifdef ONLY_FOR_LEX
-        DEBUG_FOR_LAB4("INT",yytext,yylineno,i);
-    #else
-    return INT;
-    #endif
-
-}
-{FLOAT} {
-    float i;
-    sscanf(yytext,"%f",&i);
-    #ifdef ONLY_FOR_LEX
-        DEBUG_FOR_LAB4("FLOAT",yytext,yylineno,i);
-    #else
-    return FLOAT;
-    #endif
-
+	DEBUG_FOR_LAB4("NUM",yytext,yylineno,i);
 }
 %%
 

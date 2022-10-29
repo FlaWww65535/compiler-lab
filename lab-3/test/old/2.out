@@ -9,20 +9,19 @@
  SEMICOLON         ;         4         0
         ID         a         5         3
     ASSIGN         =         5         0
-       INT         0         5         0
+       NUM         0         5         0
  SEMICOLON         ;         5         0
         ID     while         6         3
     LPAREN         (         6         0
         ID         a         6         3
       LESS         <         6         0
-       INT        10         6        10
+       NUM        10         6        10
     RPAREN         )         6         0
     LBRACE         {         6         0
         ID         a         7         6
     ASSIGN         =         7         0
         ID         a         7         6
-       MUL         *         7         0
-       INT      2345         7      2345
+*       NUM      2345         7      2345
  SEMICOLON         ;         7         0
     RBRACE         }         8         0
     RETURN    return         9         0
@@ -39,13 +38,14 @@
  SEMICOLON         ;        13         0
         ID   _testid        14        12
     ASSIGN         =        14         0
-       INT         0        14         0
+       NUM         0        14         0
  SEMICOLON         ;        14         0
         IF        if        15         0
     LPAREN         (        15         0
         ID   _testid        15        12
-     EQUAL        ==        15         0
-       INT         0        15         0
+    ASSIGN         =        15         0
+    ASSIGN         =        15         0
+       NUM         0        15         0
     RPAREN         )        15         0
     LBRACE         {        15         0
        INT       int        16         0
@@ -57,7 +57,7 @@
         ID  _testid1        18        15
     ASSIGN         =        18         0
         ID  _testid1        18        15
-       INT        +1        18         1
+       NUM        +1        18         1
  SEMICOLON         ;        18         0
     RBRACE         }        19         0
     LBRACE         {        23         0
@@ -74,6 +74,6 @@
         ID         b        29        12
  SEMICOLON         ;        29         0
     RETURN    return        30         0
-       INT         0        30         0
+       NUM         0        30         0
  SEMICOLON         ;        30         0
     RBRACE         }        31         0
