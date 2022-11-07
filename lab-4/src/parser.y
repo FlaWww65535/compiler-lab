@@ -1,5 +1,6 @@
 %code top{
     #include <iostream>
+	#include <vector>
     #include <assert.h>
     #include "parser.h"
     extern Ast ast;
@@ -19,6 +20,8 @@
     StmtNode* stmttype;
     ExprNode* exprtype;
     Type* type;
+	IDList* idlist;
+	IDListElement* idlistelement;
 }
 
 %start Program
@@ -27,11 +30,14 @@
 %token IF ELSE WHILE
 %token CONST
 %token INT VOID
-%token LPAREN RPAREN LBRACE RBRACE SEMICOLON
+%token LPAREN RPAREN LBRACE RBRACE SEMICOLON COMMA
 %token ADD SUB OR AND LESS ASSIGN
 %token RETURN
 
-%nterm <stmttype> Stmts Stmt AssignStmt BlockStmt IfStmt ReturnStmt DeclStmt FuncDef DeclAssignStmt WhileStmt
+
+%nterm <stmttype> Stmts Stmt AssignStmt BlockStmt IfStmt ReturnStmt /*DeclStmt DeclAssignStmt*/ FuncDef WhileStmt IDListDeclStmt
+%nterm <idlist> IDList
+%nterm <idlistelement> IDListEle
 %nterm <exprtype> Exp AddExp Cond LOrExp PrimaryExp LVal RelExp LAndExp
 %nterm <type> Type
 
@@ -55,9 +61,10 @@ Stmt
     | IfStmt {$$=$1;}
 	| WhileStmt {$$=$1;}
     | ReturnStmt {$$=$1;}
-    | DeclStmt {$$=$1;}
-	| DeclAssignStmt{$$=$1;}
+    /*| DeclStmt {$$=$1;}
+	| DeclAssignStmt{$$=$1;}*/
     | FuncDef {$$=$1;}
+	| IDListDeclStmt {$$=$1;}
     ;
 LVal
     : ID {
@@ -78,7 +85,7 @@ AssignStmt
     LVal ASSIGN Exp SEMICOLON {
 		Id * lval = dynamic_cast<Id *>$1;
 		const IdentifierSymbolEntry *lvalEntry=dynamic_cast<const IdentifierSymbolEntry *>(lval->getEntry());
-		if(lvalEntry->getConst())
+		if(lvalEntry->getType()->isConstInt())
 		{
             fprintf(stderr, "identifier \"%s\" is const\n", (char*)$1);
             delete [](char*)$1;
@@ -186,12 +193,15 @@ Type
     | VOID {
         $$ = TypeSystem::voidType;
     }
+	| CONST INT {
+		$$ = TypeSystem::constIntType;
+	}
     ;
-DeclStmt
+/*DeclStmt
     :
     Type ID SEMICOLON {
         SymbolEntry *se;
-        se = new IdentifierSymbolEntry($1, $2, identifiers->getLevel(),0);
+        se = new IdentifierSymbolEntry($1, $2, identifiers->getLevel());
         identifiers->install($2, se);
         $$ = new DeclStmt(new Id(se));
         delete []$2;
@@ -201,7 +211,7 @@ DeclAssignStmt
 	:
 	Type ID ASSIGN Exp SEMICOLON{
 		SymbolEntry *se;
-		se = new IdentifierSymbolEntry($1,$2,identifiers->getLevel(),0);
+		se = new IdentifierSymbolEntry($1,$2,identifiers->getLevel());
 		identifiers->install($2,se);
 		StmtNode* declTmp = new DeclStmt(new Id(se));
 
@@ -212,26 +222,71 @@ DeclAssignStmt
 		$$ = new SeqNode(declTmp,asgnTmp);
 		
 	}
-	|CONST Type ID ASSIGN Exp SEMICOLON{
-		
-		SymbolEntry *se;
-		se = new IdentifierSymbolEntry($2,$3,identifiers->getLevel(),1);
-		identifiers->install($3,se);
-		StmtNode* declTmp = new DeclStmt(new Id(se));
-
-		Id* lvalTmp = new Id(se);
-
-		StmtNode* asgnTmp = new AssignStmt(lvalTmp,$5);
-
-		$$ = new SeqNode(declTmp,asgnTmp);
+	;*/
+IDListEle
+	:
+	ID ASSIGN Exp{
+		$$ = new IDListElement($1,$3);	
 	}
+	|ID{
+		$$ = new IDListElement($1,nullptr);	
+	}
+	;
+IDList
+	:
+	IDListEle{
+		$$=new IDList;
+		$$->insert($1);
+	}
+	|IDListEle COMMA IDList{
+		$$=$3;
+		$$->insert($1);
+	}
+	;
+
+IDListDeclStmt
+	:
+	Type IDList SEMICOLON{
+		//遍历List并设置Type
+		std::vector l= $2->list;
+		IDListElement* head=l[0];
+		SymbolEntry *se;
+		se = new IdentifierSymbolEntry($1,head->getName(),identifiers->getLevel());
+		identifiers->install(head->getName(),se);
+		StmtNode *prestmt = new DeclStmt(new Id(se));
+		if(head->isInit()){
+			prestmt = new SeqNode(
+				prestmt,
+				new AssignStmt(
+					new Id(se),head->getVal()
+				)
+			);
+		}
+
+		for(int i=1;i<(int)l.size();i++){
+			se = new IdentifierSymbolEntry($1,l[i]->getName(),identifiers->getLevel());
+			identifiers->install(l[i]->getName(),se);
+			StmtNode *pretmp = new DeclStmt(new Id(se));
+			if(l[i]->isInit()){
+				pretmp = new SeqNode(
+					pretmp,
+					new AssignStmt(
+						new Id(se),l[i]->getVal()
+					)
+				);
+			}
+			prestmt = new SeqNode(prestmt,pretmp);
+		}
+		$$ = (StmtNode *)prestmt;
+	}
+	;
 
 FuncDef
     :
     Type ID {
         Type *funcType;
         funcType = new FunctionType($1,{});
-        SymbolEntry *se = new IdentifierSymbolEntry(funcType, $2, identifiers->getLevel(),0);
+        SymbolEntry *se = new IdentifierSymbolEntry(funcType, $2, identifiers->getLevel());
         identifiers->install($2, se);
         identifiers = new SymbolTable(identifiers);
     }

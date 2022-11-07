@@ -2,6 +2,7 @@
 #define __AST_H__
 
 #include <fstream>
+#include <vector>
 
 class SymbolEntry;
 
@@ -128,6 +129,25 @@ private:
 public:
     AssignStmt(ExprNode *lval, ExprNode *expr) : lval(lval), expr(expr) {};
     void output(int level);
+};
+
+class IDListElement
+{
+private:
+	std::string name;
+	ExprNode* val;
+public:
+	IDListElement(std::string name,ExprNode* val):name(name),val(val){}
+	bool isInit()const {return val!=nullptr;}
+	std::string getName()const {return name;}
+	ExprNode* getVal()const {return val;}
+};
+
+class IDList
+{
+public:
+	std::vector<IDListElement *> list;
+	void insert(IDListElement *s){list.push_back(s);}
 };
 
 class FunctionDef : public StmtNode

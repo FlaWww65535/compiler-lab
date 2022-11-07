@@ -88,6 +88,12 @@ comment_end "*/"
         DEBUG_FOR_LAB4("ADD\t+");
     return ADD;
 }
+
+"," {
+    if(dump_tokens)
+        DEBUG_FOR_LAB4("COMMA\t,");
+    return COMMA;
+}
 ";" {
     if(dump_tokens)
         DEBUG_FOR_LAB4("SEMICOLON\t;");
