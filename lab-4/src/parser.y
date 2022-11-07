@@ -209,6 +209,6 @@ FuncDef
 
 int yyerror(char const* message)
 {
-    std::cerr<<message<<std::endl;
+    std::cerr<<"yyerror:"<<message<<std::endl;
     return -1;
 }

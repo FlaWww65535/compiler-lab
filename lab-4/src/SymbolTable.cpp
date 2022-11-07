@@ -70,6 +70,14 @@ SymbolTable::SymbolTable(SymbolTable *prev)
 SymbolEntry* SymbolTable::lookup(std::string name)
 {
     // Todo
+	auto iter = this->symbolTable.find(name);
+	if(iter==this->symbolTable.end()){
+		if(this->prev!=nullptr){
+			return this->prev->lookup(name);
+		}
+	}else{
+		return iter->second;
+	}
     return nullptr;
 }
 

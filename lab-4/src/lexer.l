@@ -4,7 +4,7 @@
     #define YY_NO_INPUT
 
     #include "parser.h"
-    #include <ostream>
+    #include <iostream>
     #include <fstream>
     using namespace std;
 
@@ -22,7 +22,13 @@ DECIMIAL ([1-9][0-9]*|0)
 ID [[:alpha:]_][[:alpha:][:digit:]_]*
 EOL (\r\n|\n|\r)
 WHITE [\t ]
+line_comment "//".*\n
+comment_begin "/*"
+comment_element ("\"*/\"")|([^*])|(\*[^\/])|\n
+comment_end "*/"
+
 %x BLOCKCOMMENT
+
 
 %%
 
@@ -116,4 +122,9 @@ WHITE [\t ]
 }
 {EOL} yylineno++;
 {WHITE}
+{line_comment} {}
+{comment_begin} BEGIN(BLOCKCOMMENT);
+<BLOCKCOMMENT>{comment_element} {}
+<BLOCKCOMMENT>{comment_end} BEGIN(INITIAL);
+
 %%
