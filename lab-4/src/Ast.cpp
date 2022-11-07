@@ -60,8 +60,9 @@ void Id::output(int level)
     name = symbolEntry->toStr();
     type = symbolEntry->getType()->toStr();
     scope = dynamic_cast<IdentifierSymbolEntry*>(symbolEntry)->getScope();
-    fprintf(yyout, "%*cId\tname: %s\tscope: %d\ttype: %s\n", level, ' ',
-            name.c_str(), scope, type.c_str());
+	std::string s= dynamic_cast<IdentifierSymbolEntry*>(symbolEntry)->getConst()?"True":"False";
+    fprintf(yyout, "%*cId\tname: %s\tscope: %d\ttype: %s\tisConst: %s\n", level, ' ',
+            name.c_str(), scope, type.c_str(),s.c_str());
 }
 
 void CompoundStmt::output(int level)
@@ -96,6 +97,12 @@ void IfElseStmt::output(int level)
     cond->output(level + 4);
     thenStmt->output(level + 4);
     elseStmt->output(level + 4);
+}
+
+void WhileStmt::output(int level){
+    fprintf(yyout, "%*cWhileStmt\n", level, ' ');
+    cond->output(level + 4);
+    loopStmt->output(level + 4);
 }
 
 void ReturnStmt::output(int level)

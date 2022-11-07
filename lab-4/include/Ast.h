@@ -47,6 +47,7 @@ class Id : public ExprNode
 public:
     Id(SymbolEntry *se) : ExprNode(se){};
     void output(int level);
+	const SymbolEntry* getEntry(){return ExprNode::symbolEntry;};
 };
 
 class StmtNode : public Node
@@ -98,6 +99,16 @@ private:
 public:
     IfElseStmt(ExprNode *cond, StmtNode *thenStmt, StmtNode *elseStmt) : cond(cond), thenStmt(thenStmt), elseStmt(elseStmt) {};
     void output(int level);
+};
+
+class WhileStmt : public StmtNode
+{
+private:
+	ExprNode *cond;
+	StmtNode *loopStmt;
+public:
+	WhileStmt(ExprNode *cond,StmtNode *loopStmt):cond(cond),loopStmt(loopStmt){};
+	void output(int level);
 };
 
 class ReturnStmt : public StmtNode

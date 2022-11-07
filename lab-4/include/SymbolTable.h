@@ -75,13 +75,15 @@ private:
     enum {GLOBAL, PARAM, LOCAL};
     std::string name;
     int scope;
+	bool isConst;
     // You can add any field you need here.
 
 public:
-    IdentifierSymbolEntry(Type *type, std::string name, int scope);
+    IdentifierSymbolEntry(Type *type, std::string name, int scope,bool isConst=0);
     virtual ~IdentifierSymbolEntry() {};
     std::string toStr();
     int getScope() const {return scope;};
+	bool getConst() const {return isConst;};
     // You can add any function you need here.
 };
 

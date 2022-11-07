@@ -24,13 +24,14 @@
 %start Program
 %token <strtype> ID 
 %token <itype> INTEGER
-%token IF ELSE
+%token IF ELSE WHILE
+%token CONST
 %token INT VOID
 %token LPAREN RPAREN LBRACE RBRACE SEMICOLON
 %token ADD SUB OR AND LESS ASSIGN
 %token RETURN
 
-%nterm <stmttype> Stmts Stmt AssignStmt BlockStmt IfStmt ReturnStmt DeclStmt FuncDef DeclAssignStmt
+%nterm <stmttype> Stmts Stmt AssignStmt BlockStmt IfStmt ReturnStmt DeclStmt FuncDef DeclAssignStmt WhileStmt
 %nterm <exprtype> Exp AddExp Cond LOrExp PrimaryExp LVal RelExp LAndExp
 %nterm <type> Type
 
@@ -52,6 +53,7 @@ Stmt
     : AssignStmt {$$=$1;}
     | BlockStmt {$$=$1;}
     | IfStmt {$$=$1;}
+	| WhileStmt {$$=$1;}
     | ReturnStmt {$$=$1;}
     | DeclStmt {$$=$1;}
 	| DeclAssignStmt{$$=$1;}
@@ -74,6 +76,13 @@ LVal
 AssignStmt
     :
     LVal ASSIGN Exp SEMICOLON {
+		Id * lval = dynamic_cast<Id *>$1;
+		const IdentifierSymbolEntry *lvalEntry=dynamic_cast<const IdentifierSymbolEntry *>(lval->getEntry());
+		if(lvalEntry->getConst())
+		{
+            fprintf(stderr, "identifier \"%s\" is const\n", (char*)$1);
+            delete [](char*)$1;
+		}
         $$ = new AssignStmt($1, $3);
     }
     ;
@@ -96,6 +105,10 @@ IfStmt
         $$ = new IfElseStmt($3, $5, $7);
     }
     ;
+WhileStmt
+	: WHILE LPAREN Cond RPAREN Stmt{
+		$$ = new WhileStmt($3,$5);
+	}
 ReturnStmt
     :
     RETURN Exp SEMICOLON{
@@ -178,7 +191,7 @@ DeclStmt
     :
     Type ID SEMICOLON {
         SymbolEntry *se;
-        se = new IdentifierSymbolEntry($1, $2, identifiers->getLevel());
+        se = new IdentifierSymbolEntry($1, $2, identifiers->getLevel(),0);
         identifiers->install($2, se);
         $$ = new DeclStmt(new Id(se));
         delete []$2;
@@ -188,7 +201,7 @@ DeclAssignStmt
 	:
 	Type ID ASSIGN Exp SEMICOLON{
 		SymbolEntry *se;
-		se = new IdentifierSymbolEntry($1,$2,identifiers->getLevel());
+		se = new IdentifierSymbolEntry($1,$2,identifiers->getLevel(),0);
 		identifiers->install($2,se);
 		StmtNode* declTmp = new DeclStmt(new Id(se));
 
@@ -199,12 +212,26 @@ DeclAssignStmt
 		$$ = new SeqNode(declTmp,asgnTmp);
 		
 	}
+	|CONST Type ID ASSIGN Exp SEMICOLON{
+		
+		SymbolEntry *se;
+		se = new IdentifierSymbolEntry($2,$3,identifiers->getLevel(),1);
+		identifiers->install($3,se);
+		StmtNode* declTmp = new DeclStmt(new Id(se));
+
+		Id* lvalTmp = new Id(se);
+
+		StmtNode* asgnTmp = new AssignStmt(lvalTmp,$5);
+
+		$$ = new SeqNode(declTmp,asgnTmp);
+	}
+
 FuncDef
     :
     Type ID {
         Type *funcType;
         funcType = new FunctionType($1,{});
-        SymbolEntry *se = new IdentifierSymbolEntry(funcType, $2, identifiers->getLevel());
+        SymbolEntry *se = new IdentifierSymbolEntry(funcType, $2, identifiers->getLevel(),0);
         identifiers->install($2, se);
         identifiers = new SymbolTable(identifiers);
     }

@@ -47,6 +47,11 @@ comment_end "*/"
         DEBUG_FOR_LAB4("VOID\tvoid");
     return VOID;
 }
+"const" {
+    if(dump_tokens)
+        DEBUG_FOR_LAB4("CONST\tconst");
+    return CONST;
+}
 "if" {
     if(dump_tokens)
         DEBUG_FOR_LAB4("IF\tif");
@@ -57,6 +62,11 @@ comment_end "*/"
         DEBUG_FOR_LAB4("ELSE\telse");
     return ELSE;
 };
+"while" {
+	if(dump_tokens)
+        DEBUG_FOR_LAB4("WHILE\twhile");
+	return WHILE;
+}
 "return" {
     if(dump_tokens)
         DEBUG_FOR_LAB4("RETURN\treturn");

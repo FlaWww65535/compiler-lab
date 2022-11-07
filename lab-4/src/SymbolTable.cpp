@@ -20,7 +20,7 @@ std::string ConstantSymbolEntry::toStr()
     return buffer.str();
 }
 
-IdentifierSymbolEntry::IdentifierSymbolEntry(Type *type, std::string name, int scope) : SymbolEntry(type, SymbolEntry::VARIABLE), name(name)
+IdentifierSymbolEntry::IdentifierSymbolEntry(Type *type, std::string name, int scope,bool isConst) : SymbolEntry(type, SymbolEntry::VARIABLE), name(name), isConst(isConst)
 {
     this->scope = scope;
 }
