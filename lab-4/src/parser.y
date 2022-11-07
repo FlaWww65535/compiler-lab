@@ -30,7 +30,7 @@
 %token ADD SUB OR AND LESS ASSIGN
 %token RETURN
 
-%nterm <stmttype> Stmts Stmt AssignStmt BlockStmt IfStmt ReturnStmt DeclStmt FuncDef
+%nterm <stmttype> Stmts Stmt AssignStmt BlockStmt IfStmt ReturnStmt DeclStmt FuncDef DeclAssignStmt
 %nterm <exprtype> Exp AddExp Cond LOrExp PrimaryExp LVal RelExp LAndExp
 %nterm <type> Type
 
@@ -54,6 +54,7 @@ Stmt
     | IfStmt {$$=$1;}
     | ReturnStmt {$$=$1;}
     | DeclStmt {$$=$1;}
+	| DeclAssignStmt{$$=$1;}
     | FuncDef {$$=$1;}
     ;
 LVal
@@ -183,6 +184,21 @@ DeclStmt
         delete []$2;
     }
     ;
+DeclAssignStmt
+	:
+	Type ID ASSIGN Exp SEMICOLON{
+		SymbolEntry *se;
+		se = new IdentifierSymbolEntry($1,$2,identifiers->getLevel());
+		identifiers->install($2,se);
+		StmtNode* declTmp = new DeclStmt(new Id(se));
+
+		Id* lvalTmp = new Id(se);
+
+		StmtNode* asgnTmp = new AssignStmt(lvalTmp,$4);
+
+		$$ = new SeqNode(declTmp,asgnTmp);
+		
+	}
 FuncDef
     :
     Type ID {
