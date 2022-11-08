@@ -22,25 +22,23 @@
     Type* type;
 	IDList* idlist;
 	IDListElement* idlistelement;
-	std::vector<std::pair<Type*,std::string>> *paramlist;
 }
 
 %start Program
 %token <strtype> ID 
 %token <itype> INTEGER
-%token IF ELSE WHILE
+%token IF ELSE WHILE CONTINUE BREAK
 %token CONST
 %token INT VOID
 %token LPAREN RPAREN LBRACE RBRACE SEMICOLON COMMA
-%token ADD SUB OR AND LESS ASSIGN
+%token ADD SUB MUL DIV MOD OR AND LESS GREATER LESSEQ GREATEREQ NOTEQ EQUAL ASSIGN
 %token RETURN
-
+%token UMINUS UPLUS NOT
 
 %nterm <stmttype> Stmts Stmt AssignStmt BlockStmt IfStmt ReturnStmt /*DeclStmt DeclAssignStmt*/ FuncDef WhileStmt IDListDeclStmt
 %nterm <idlist> IDList
 %nterm <idlistelement> IDListEle
-%nterm <paramlist> ParamList
-%nterm <exprtype> Exp AddExp Cond LOrExp PrimaryExp LVal RelExp LAndExp
+%nterm <exprtype> Exp Cond AddExp MulExp  UnaryExp FuncUseExp FuncRParams PrimaryExp LVal RelExp LAndExp LOrExp
 %nterm <type> Type
 
 %precedence THEN
@@ -67,6 +65,7 @@ Stmt
 	| DeclAssignStmt{$$=$1;}*/
     | FuncDef {$$=$1;}
 	| IDListDeclStmt {$$=$1;}
+	//| Exp SEMICOLON{$$=$1}
     ;
 LVal
     : ID {
@@ -109,23 +108,23 @@ BlockStmt
 IfStmt
     : IF LPAREN Cond RPAREN Stmt %prec THEN {
         $$ = new IfStmt($3, $5);
+        assert("ifstmt");
     }
     | IF LPAREN Cond RPAREN Stmt ELSE Stmt {
         $$ = new IfElseStmt($3, $5, $7);
+        assert("ifstmt");
     }
     ;
 WhileStmt
 	: WHILE LPAREN Cond RPAREN Stmt{
 		$$ = new WhileStmt($3,$5);
 	}
+	;
 ReturnStmt
     :
     RETURN Exp SEMICOLON{
         $$ = new ReturnStmt($2);
     }
-	|RETURN SEMICOLON{
-		$$ = new ReturnStmt(new Constant(new ConstantSymbolEntry(new VoidType(),0)));
-	}
     ;
 Exp
     :
@@ -149,16 +148,89 @@ AddExp
     :
     PrimaryExp {$$ = $1;}
     |
-    AddExp ADD PrimaryExp
+    AddExp ADD MulExp
     {
         SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
         $$ = new BinaryExpr(se, BinaryExpr::ADD, $1, $3);
     }
     |
-    AddExp SUB PrimaryExp
+    AddExp SUB MulExp
     {
         SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
         $$ = new BinaryExpr(se, BinaryExpr::SUB, $1, $3);
+    }
+    ;
+MulExp
+    :
+    UnaryExp{$$ = $1;}
+    |
+    MulExp MUL UnaryExp
+    {
+        SymbolEntry *se=new TemporarySymbolEntry(TypeSystem::intType,SymbolTable::getLabel());
+        $$ = new BinaryExpr(se, BinaryExpr::MUL, $1, $3);
+    }
+    |
+    MulExp DIV UnaryExp
+    {
+        SymbolEntry *se=new TemporarySymbolEntry(TypeSystem::intType,SymbolTable::getLabel());
+        $$ = new BinaryExpr(se, BinaryExpr::DIV, $1, $3);
+    }
+    |
+    MulExp MOD UnaryExp
+    {
+        SymbolEntry *se=new TemporarySymbolEntry(TypeSystem::intType,SymbolTable::getLabel());
+        $$ = new BinaryExpr(se, BinaryExpr::MOD, $1, $3);
+    }
+    ;
+UnaryExp
+    :
+    PrimaryExp{$$=$1;}
+    |
+    FuncUseExp{$$=$1;}
+    |
+    SUB UnaryExp %prec UMINUS
+    {
+        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType,SymbolTable::getLabel());
+        $$ = new UnaryExpr(se,UnaryExpr::UMINUS,$2);
+    }
+    |
+    ADD UnaryExp %prec UPLUS
+    {
+        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType,SymbolTable::getLabel());
+        $$ = new UnaryExpr(se,UnaryExpr::UPLUS,$2);
+    }
+    |
+    NOT UnaryExp
+    {
+         SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType,SymbolTable::getLabel());
+         $$ = new UnaryExpr(se,UnaryExpr::NOT,$2);
+    }
+    ;
+FuncUseExp
+    :
+    LVal LPAREN FuncRParams RPAREN
+    {
+        SymbolEntry *se=new TemporarySymbolEntry(TypeSystem::intType,SymbolTable::getLabel());
+        $$=new FuncUseExpr(se,$1,$3);
+    }
+    |
+    LVal LPAREN RPAREN
+    {
+        SymbolEntry *se=new TemporarySymbolEntry(TypeSystem::intType,SymbolTable::getLabel());
+        $$=new FuncUseExpr(se,$1);
+    }
+    ;
+FuncRParams
+    :
+    Exp
+    {
+        $$=$1;
+    };
+    |
+    FuncRParams COMMA Exp
+    {
+         SymbolEntry *se=new TemporarySymbolEntry(TypeSystem::intType,SymbolTable::getLabel());
+         $$=new FuncRParams(se,$3,$1);
     }
     ;
 RelExp
@@ -169,6 +241,36 @@ RelExp
     {
         SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
         $$ = new BinaryExpr(se, BinaryExpr::LESS, $1, $3);
+    }
+    |
+    RelExp GREATER AddExp
+    {
+        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+        $$ = new BinaryExpr(se, BinaryExpr::GREATER, $1, $3);
+    }
+    |
+     RelExp LESSEQ AddExp
+    {
+        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+        $$ = new BinaryExpr(se, BinaryExpr::LESSEQ, $1, $3);
+    }
+    |
+     RelExp GREATEREQ AddExp
+    {
+        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+        $$ = new BinaryExpr(se, BinaryExpr::GREATEREQ, $1, $3);
+    }
+    |
+    RelExp NOTEQ AddExp
+    {
+        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+        $$ = new BinaryExpr(se, BinaryExpr::NOTEQ, $1, $3);
+    }
+    |
+    RelExp EQUAL AddExp
+    {
+        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+        $$ = new BinaryExpr(se, BinaryExpr::EQUAL, $1, $3);
     }
     ;
 LAndExp
@@ -204,14 +306,15 @@ Type
     ;
 /*DeclStmt
     :
-    Type ID SEMICOLON {
+    Type IDList SEMICOLON {
         SymbolEntry *se;
         se = new IdentifierSymbolEntry($1, $2, identifiers->getLevel());
         identifiers->install($2, se);
         $$ = new DeclStmt(new Id(se));
         delete []$2;
     }
-    ;
+    ;*/
+/*
 DeclAssignStmt
 	:
 	Type ID ASSIGN Exp SEMICOLON{
@@ -286,28 +389,16 @@ IDListDeclStmt
 	}
 	;
 
-ParamList
-	:
-	Type ID{
-		$$ = new std::vector<std::pair<Type*,std::string>>; 
-		$$->push_back(std::make_pair($1,$2));
-	}
-	|Type ID COMMA ParamList{
-		$$ = $4;
-		$$->push_back(std::make_pair($1,$2));
-	}
-
 FuncDef
     :
-    Type ID 
-    LPAREN RPAREN
-	{
+    Type ID {
         Type *funcType;
         funcType = new FunctionType($1,{});
         SymbolEntry *se = new IdentifierSymbolEntry(funcType, $2, identifiers->getLevel());
         identifiers->install($2, se);
         identifiers = new SymbolTable(identifiers);
     }
+    LPAREN RPAREN
     BlockStmt
     {
         SymbolEntry *se;
@@ -319,40 +410,6 @@ FuncDef
         delete top;
         delete []$2;
     }
-	|
-    Type ID LPAREN ParamList{
-        Type *funcType;
-
-		std::vector<std::pair<Type*,std::string>> l = *$4; 
-		std::vector<Type* > *tl = new std::vector<Type*>;
-		for(int i=0;i<(int)l.size();i++)
-		{
-			tl->push_back(l[i].first);
-		}
-        funcType = new FunctionType($1,*tl);
-        
-		SymbolEntry *se = new IdentifierSymbolEntry(funcType, $2, identifiers->getLevel());
-        identifiers->install($2, se);
-        identifiers = new SymbolTable(identifiers);
-
-		for(int i=0;i<(int)l.size();i++){
-			SymbolEntry *param = new IdentifierSymbolEntry(l[i].first,l[i].second,identifiers->getLevel());
-        	identifiers->install(l[i].second, param);
-		}
-    }
-	RPAREN
-    BlockStmt
-    {
-        SymbolEntry *se;
-        se = identifiers->lookup($2);
-
-        assert(se != nullptr);
-        $$ = new FunctionDef(se, $7);
-        SymbolTable *top = identifiers;
-        identifiers = identifiers->getPrev();
-        delete top;
-        delete []$2;
-	}
     ;
 %%
 
