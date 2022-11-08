@@ -1,6 +1,6 @@
 #ifndef __SYMBOLTABLE_H__
 #define __SYMBOLTABLE_H__
-
+#include "Type.h"
 #include <string>
 #include <map>
 

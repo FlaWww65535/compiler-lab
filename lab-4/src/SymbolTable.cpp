@@ -44,10 +44,23 @@ std::string TemporarySymbolEntry::toStr()
 
 SymbolTable::SymbolTable()
 {
+    Type *funcType;
+    funcType = new FunctionType(new IntType(4),{});
+    std::string s = "getint";
+    symbolTable[s]=new IdentifierSymbolEntry(funcType, s.c_str(), identifiers->getLevel());
+    funcType = new FunctionType(new IntType(4),{});
+    s = "putint";
+    symbolTable[s]=new IdentifierSymbolEntry(funcType, s.c_str(), identifiers->getLevel());
+    funcType = new FunctionType(new IntType(1),{});
+    s = "putch";
+    symbolTable[s]=new IdentifierSymbolEntry(funcType, s.c_str(), identifiers->getLevel());
+    funcType = new FunctionType(new IntType(1),{});
+    s = "getch";
+    symbolTable[s]=new IdentifierSymbolEntry(funcType, s.c_str(), identifiers->getLevel());
     prev = nullptr;
     level = 0;
-}
 
+}
 SymbolTable::SymbolTable(SymbolTable *prev)
 {
     this->prev = prev;

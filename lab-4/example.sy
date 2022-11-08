@@ -1,33 +1,11 @@
-//this is a test
-const int cst=1;
-
-int a=1,b=2;
-
-int test(int s1,int s2,int s3){
-	s1=s1+1;
-	return 0;
+int main() {
+    int a;
+    a = 10;
+    if (+-!!!a) {
+        a = - - -1;
+    }
+    else {
+        a = 0;
+    }
+    return a;
 }
-
-int test_1(){
-	return 0;
-}
-
-void test_2(int x1,int x2,int x3,int x4,int x5){
-	return;
-}
-
-int main()
-{
-	int a=1,b=2;
-    a = 1 + 2;
-	while(1){
-		a = 3;
-	}
-    if(a < 5)
-        return 1;
-    return 0;
-}
-/*
-	*
-	"*/"
-*/

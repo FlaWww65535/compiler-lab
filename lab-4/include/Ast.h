@@ -17,6 +17,8 @@ public:
     virtual void output(int level) = 0;
 };
 
+
+
 class ExprNode : public Node
 {
 protected:
@@ -31,8 +33,44 @@ private:
     int op;
     ExprNode *expr1, *expr2;
 public:
-    enum {ADD, SUB, AND, OR, LESS};
+    enum {ADD, SUB, MUL,DIV,MOD,AND, OR, LESS,GREATER,LESSEQ,GREATEREQ,NOTEQ,EQUAL};
     BinaryExpr(SymbolEntry *se, int op, ExprNode*expr1, ExprNode*expr2) : ExprNode(se), op(op), expr1(expr1), expr2(expr2){};
+    void output(int level);
+};
+class UnaryExpr : public ExprNode
+{
+private:
+    int op;
+    ExprNode *expr1;
+public:
+    enum {UMINUS,UPLUS,NOT};
+    UnaryExpr(SymbolEntry *se, int op, ExprNode*expr1) : ExprNode(se),op(op),expr1(expr1){};
+    void output(int level);
+};
+class PrimaryExp : public ExprNode
+{
+private :
+     ExprNode *expr1;
+public :
+     PrimaryExp(SymbolEntry *se,ExprNode* expr1):ExprNode(se),expr1(expr1){};
+     void output(int level);
+};
+class FuncUseExpr : public ExprNode
+{
+private:
+    ExprNode *funcName,*funcRParams;
+public:
+    FuncUseExpr(SymbolEntry *se, ExprNode*funcName, ExprNode* funcRParams):  ExprNode(se),funcName(funcName), funcRParams(funcRParams){};
+    FuncUseExpr(SymbolEntry *se, ExprNode*funcName): ExprNode(se),funcName(funcName),funcRParams(nullptr){};
+    void output(int level);
+};
+
+class FuncRParams: public ExprNode
+{
+private:
+    ExprNode *expr1,* funcRParams;
+public:
+    FuncRParams(SymbolEntry *se,ExprNode *expr1,ExprNode* funcRParams): ExprNode(se),expr1(expr1),funcRParams(funcRParams){};
     void output(int level);
 };
 
@@ -120,7 +158,15 @@ public:
     ReturnStmt(ExprNode*retValue) : retValue(retValue) {};
     void output(int level);
 };
+class ExpStmt : public StmtNode
+{
 
+private:
+    ExprNode *expr1;
+public :
+    ExpStmt(ExprNode* expr1): expr1(expr1){};
+    void output(int level);
+};
 class AssignStmt : public StmtNode
 {
 private:

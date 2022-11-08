@@ -17,7 +17,9 @@
         fputs(DEBUG_INFO.c_str(), yyout);
     }
 %}
-
+HEX (\+|\-)?0(X|x)[0-9a-fA-F]+
+OCTAL (\+|\-)?0[0-7]+
+FLOAT [-+]?[0-9]*\.?[0-9]*
 DECIMIAL ([1-9][0-9]*|0)
 ID [[:alpha:]_][[:alpha:][:digit:]_]*
 EOL (\r\n|\n|\r)
@@ -73,22 +75,82 @@ comment_end "*/"
     return RETURN;
 }
 
+
+"break" {
+    if(dump_tokens)
+        DEBUG_FOR_LAB4("BREAK\tbreak");
+    return BREAK;
+
+}
+"continue" {
+    if(dump_tokens)
+        DEBUG_FOR_LAB4("CONTINUE\tcontinue");
+    return CONTINUE;
+}
+
 "=" {
     if(dump_tokens)
         DEBUG_FOR_LAB4("ASSIGN\t=");
     return ASSIGN;
+}
+"==" {
+    if(dump_tokens)
+        DEBUG_FOR_LAB4("EQUAL\t==");
+    return EQUAL;
+
 }
 "<" {
     if(dump_tokens)
         DEBUG_FOR_LAB4("LESS\t<");
     return LESS;
 }
+">" {
+    if(dump_tokens)
+        DEBUG_FOR_LAB4("GREATER\t>");
+    return GREATER;
+}
+"<=" {
+    if(dump_tokens)
+        DEBUG_FOR_LAB4("LESSEQ\t<=");
+    return LESSEQ;
+
+}
+">=" {
+    if(dump_tokens)
+        DEBUG_FOR_LAB4("GREATEREQ\t>=");
+    return GREATEREQ;
+}
+"!=" {
+     if(dump_tokens)
+        DEBUG_FOR_LAB4("NOTEQ\t!=");
+    return NOTEQ;
+
+}
 "+" {
     if(dump_tokens)
         DEBUG_FOR_LAB4("ADD\t+");
     return ADD;
 }
-
+"-" {
+    if(dump_tokens)
+        DEBUG_FOR_LAB4("SUB\t-");
+    return SUB;
+}
+"*" {
+    if(dump_tokens)
+        DEBUG_FOR_LAB4("MUL\t*");
+    return MUL;
+}
+"/" {
+    if(dump_tokens)
+        DEBUG_FOR_LAB4("DIV\t/");
+    return DIV;
+}
+"%" {
+    if(dump_tokens)
+        DEBUG_FOR_LAB4("MOD\t%");
+    return MOD;
+}
 "," {
     if(dump_tokens)
         DEBUG_FOR_LAB4("COMMA\t,");
@@ -119,14 +181,39 @@ comment_end "*/"
         DEBUG_FOR_LAB4("RBRACE\t}");
     return RBRACE;
 }
-
+"&&" {
+    if(dump_tokens)
+        DEBUG_FOR_LAB4("AND\t&&");
+    return RBRACE;
+}
+"||" {
+    if(dump_tokens)
+        DEBUG_FOR_LAB4("OR\t||");
+    return RBRACE;
+}
+"!" {
+    if(dump_tokens)
+        DEBUG_FOR_LAB4("NOT\t!");
+    return RBRACE;
+}
 {DECIMIAL} {
     if(dump_tokens)
         DEBUG_FOR_LAB4(yytext);
     yylval.itype = atoi(yytext);
     return INTEGER;
 }
-
+{OCTAL} {
+    if(dump_tokens)
+        DEBUG_FOR_LAB4(yytext);
+    yylval.itype = atoi(yytext);
+    return INTEGER;
+}
+{HEX} {
+    if(dump_tokens)
+        DEBUG_FOR_LAB4(yytext);
+    yylval.itype = atoi(yytext);
+    return INTEGER;
+}
 {ID} {
     if(dump_tokens)
         DEBUG_FOR_LAB4(yytext);
